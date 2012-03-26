@@ -323,19 +323,25 @@
 	</pluginRepository>
   </pluginRepositories>
 
-<distributionManagement>
-  <repository>
-    <id>maven-apigw-repo</id>
-    <name>Maven Repo for API GW (releases)</name>
-    <url>svn:https://X.googlecode.com/svn/maven-repo/releases</url>
-    <uniqueVersion>false</uniqueVersion>
-  </repository>
-  <snapshotRepository>
-    <id>maven-apigw-snapshot</id>
-    <name>Maven Repo API GW (snapshots)</name>
-    <url>svn:https://apigw.googlecode.com/svn/maven-repo/snapshots</url>
-    <uniqueVersion>false</uniqueVersion>
- </snapshotRepository>
-</distributionManagement>
+  <distributionManagement>
+
+    <site>
+      <id>static.springframework.org</id>
+      <url>scp://static.springframework.org/var/www/domains/springframework.org/static/htdocs/spring-security/oauth</url>
+    </site>
+
+    <repository>
+      <id>spring-milestone</id>
+      <name>Spring Milestone Repository</name>
+      <url>s3://maven.springframework.org/milestone</url>
+    </repository>
+
+    <snapshotRepository>
+      <id>spring-snapshot</id>
+      <name>Spring Snapshot Repository</name>
+      <url>s3://maven.springframework.org/snapshot</url>
+    </snapshotRepository>
+
+  </distributionManagement>
 
 </project>
