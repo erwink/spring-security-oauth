@@ -28,7 +28,6 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.common.exceptions.InvalidClientException;
-import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -38,13 +37,14 @@ import org.springframework.util.StringUtils;
 public class JdbcClientDetailsService implements ClientDetailsService, ClientRegistrationService {
 
 	private static final String CLIENT_FIELDS = "resource_ids, client_secret, scope, "
-			+ "authorized_grant_types, web_server_redirect_uri, authorities, access_token_validity";
+			+ "authorized_grant_types, web_server_redirect_uri, authorities, access_token_validity, "
+			+ "refresh_token_validity";
 
 	private static final String DEFAULT_SELECT_STATEMENT = "select client_id, " + CLIENT_FIELDS
 			+ " from oauth_client_details where client_id = ?";
 
 	private static final String DEFAULT_INSERT_STATEMENT = "insert into oauth_client_details (" + CLIENT_FIELDS
-			+ ", client_id) values (?,?,?,?,?,?,?,?)";
+			+ ", client_id) values (?,?,?,?,?,?,?,?,?)";
 
 	private static final String DEFAULT_UPDATE_STATEMENT = "update oauth_client_details "
 			+ "set " + CLIENT_FIELDS.replaceAll(", ", "=?, ")+"=? where client_id = ?";
@@ -75,7 +75,7 @@ public class JdbcClientDetailsService implements ClientDetailsService, ClientReg
 		this.passwordEncoder = passwordEncoder;
 	}
 
-	public ClientDetails loadClientByClientId(String clientId) throws OAuth2Exception {
+	public ClientDetails loadClientByClientId(String clientId) throws InvalidClientException {
 		ClientDetails details;
 		try {
 			details = jdbcTemplate.queryForObject(selectClientDetailsSql, new RowMapper<ClientDetails>() {
@@ -85,6 +85,7 @@ public class JdbcClientDetailsService implements ClientDetailsService, ClientReg
 					details.setClientId(rs.getString(1));
 					details.setClientSecret(rs.getString(3));
 					details.setAccessTokenValiditySeconds(rs.getInt(8));
+					details.setRefreshTokenValiditySeconds(rs.getInt(9));
 					return details;
 				}
 			}, clientId);
@@ -128,6 +129,7 @@ public class JdbcClientDetailsService implements ClientDetailsService, ClientReg
 			clientDetails.getRegisteredRedirectUri()!=null ? StringUtils.collectionToCommaDelimitedString(clientDetails.getRegisteredRedirectUri()) : null,
 			clientDetails.getAuthorities()!=null ? StringUtils.collectionToCommaDelimitedString(clientDetails.getAuthorities()) : null,
 			clientDetails.getAccessTokenValiditySeconds(),
+			clientDetails.getRefreshTokenValiditySeconds(),
 			clientDetails.getClientId()
 		};
 	}
